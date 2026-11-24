@@ -64,7 +64,7 @@ export default function App() {
     const local = readLocal();
     try {
       // Modifiche fatte offline: hanno la precedenza e vengono inviate
-      if (local?.pending && Array.isArray(local.wines)) {
+      if (local?.pending && Array.isArray(local.wines) && local.wines.length > 0) {
         setWines(local.wines);
         await push(local.wines);
         return;
@@ -122,6 +122,11 @@ export default function App() {
 
   /** Applica una modifica, la salva subito sul telefono e poi su Supabase. */
   const update = (fn) => {
+    // Senza login non si modifica nulla: una copia locale incompleta sovrascriverebbe la cantina su Supabase
+    if (needLogin) {
+      go("impostazioni");
+      return;
+    }
     const next = fn(wines);
     setWines(next);
     writeLocal(next, true);
@@ -346,9 +351,11 @@ export default function App() {
                 {filtered.map((w) => <WineCard key={w.id} wine={w} onClick={() => openWine(w.id)} />)}
               </div>
             )}
-            <button className="fab" aria-label="Aggiungi bottiglia" onClick={() => { setEditing({}); go("form"); }}>
-              <Icon name="plus" size={28} strokeWidth={2.2} />
-            </button>
+            {!needLogin && (
+              <button className="fab" aria-label="Aggiungi bottiglia" onClick={() => { setEditing({}); go("form"); }}>
+                <Icon name="plus" size={28} strokeWidth={2.2} />
+              </button>
+            )}
           </>
         )}
 
