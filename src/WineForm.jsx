@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Icon, WineBottle } from "./icons.jsx";
 import { WindowBar } from "./components.jsx";
-import { CAMPI_RICERCA, NAZIONI, TIPI, emptyForm, getWindowStatus, isNV } from "./data.js";
+import { CAMPI_RICERCA, NAZIONI, TIPI, emptyForm, getWindowStatus, isNV, prezzo } from "./data.js";
 import { RICERCA_WEB_ATTIVA } from "./supabase.js";
 
 function Field({ label, children }) {
@@ -59,7 +59,14 @@ export default function WineForm({ initial, editMode, canSearch, onSearch, onSav
   const submit = (e) => {
     e.preventDefault();
     if (!form.nome.trim()) return;
-    onSave({ ...form, nome: form.nome.trim(), produttore: form.produttore.trim(), annata: nv ? 0 : Number(form.annata) || 0 });
+    const p = prezzo(form);
+    onSave({
+      ...form,
+      nome: form.nome.trim(),
+      produttore: form.produttore.trim(),
+      annata: nv ? 0 : Number(form.annata) || 0,
+      prezzo: p === null ? "" : p,
+    });
   };
 
   return (
@@ -225,6 +232,15 @@ export default function WineForm({ initial, editMode, canSearch, onSearch, onSav
             <input className="input" value={form.posizione} onChange={set("posizione")} placeholder="es. Scaffale B2" />
           </Field>
         </div>
+        <Field label="Prezzo d'acquisto (€ a bottiglia)">
+          <input
+            className="input"
+            inputMode="decimal"
+            value={form.prezzo ?? ""}
+            onChange={(e) => setVal("prezzo", e.target.value.replace(/[^\d.,]/g, ""))}
+            placeholder="es. 35"
+          />
+        </Field>
         <Field label="Note personali">
           <textarea className="textarea" rows={3} value={form.note} onChange={set("note")} />
         </Field>

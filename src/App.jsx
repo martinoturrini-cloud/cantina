@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { supabase, loadWines, saveWines, cercaVino } from "./supabase.js";
 import { initialWines } from "./seed.js";
 import {
-  TIPI, annataLabel, byUrgency, formatDate, getWindowStatus, plural, qty, qtyBevuta, toYear,
+  TIPI, annataLabel, byUrgency, euro, formatDate, getWindowStatus, plural, prezzo, qty, qtyBevuta, toYear,
 } from "./data.js";
 import { GrapeIcon, Icon, WineBottle, WineGlass } from "./icons.jsx";
 import { ConfirmModal, Modal, Stars, StatusBadge, WindowBar, WineCard } from "./components.jsx";
@@ -468,6 +468,11 @@ function Detail({ wine, onBack, onDrink, onEdit, onRestore, onDelete }) {
     ["pin", "Posizione", wine.posizione || "—"],
     ["shelf", "Bottiglie", wine.consumata ? `${qtyBevuta(wine)} bevute` : qty(wine)],
   ];
+  const p = prezzo(wine);
+  if (p !== null) {
+    const n = wine.consumata ? qtyBevuta(wine) : qty(wine);
+    cells.push(["tag", "Prezzo d'acquisto", n > 1 ? `${euro(p)} × ${n} = ${euro(p * n)}` : euro(p)]);
+  }
   const blocks = [
     ["info", "Descrizione", wine.descrizione],
     ["barrel", "Vinificazione e affinamento", wine.affinamento],

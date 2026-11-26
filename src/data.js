@@ -25,8 +25,18 @@ export const emptyForm = () => ({
   nome: "", produttore: "", annata: new Date().getFullYear(), nazione: "Italia", regione: "", tipo: "Rosso",
   denominazione: "", uvaggio: "", affinamento: "", descrizione: "", abbinamenti: "", servizio: "",
   finestraDa: "", finestraA: "", apiceDa: "", apiceA: "", motivazioneFinestra: "", fonti: [],
-  posizione: "", note: "", quantita: 1,
+  posizione: "", note: "", quantita: 1, prezzo: "",
 });
+
+/** Prezzo d'acquisto a bottiglia come numero, oppure null se non indicato. */
+export const prezzo = (w) => {
+  if (w?.prezzo === undefined || w?.prezzo === null || w?.prezzo === "") return null;
+  const n = Number(String(w.prezzo).replace(",", "."));
+  return Number.isFinite(n) && n >= 0 ? n : null;
+};
+
+export const euro = (n) =>
+  n.toLocaleString("it-IT", { style: "currency", currency: "EUR", maximumFractionDigits: n % 1 === 0 ? 0 : 2 });
 
 /** Quantità reale: 0 resta 0 (nella versione precedente 0 veniva letto come 1). */
 export const qty = (w) => {

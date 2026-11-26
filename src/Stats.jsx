@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Icon, WineBottle, WineGlass } from "./icons.jsx";
-import { TIPI, annataLabel, getWindowStatus, qty, qtyBevuta } from "./data.js";
+import { TIPI, annataLabel, euro, getWindowStatus, prezzo, qty, qtyBevuta } from "./data.js";
 
 function Bars({ title, rows, onPick, gold }) {
   const max = Math.max(...rows.map((r) => r.count), 1);
@@ -35,6 +35,23 @@ export default function Stats({ attive, consumate, onOpen }) {
     { label: "In scadenza / scadute", val: byStatus("scadenza") + byStatus("scaduta"), icon: <Icon name="bell" size={22} />, color: "var(--warn)" },
     { label: "Bevute", val: consumate.reduce((s, w) => s + qtyBevuta(w), 0), icon: <WineGlass size={26} /> },
   ];
+
+  // Valore della cantina: solo le bottiglie con il prezzo d'acquisto indicato
+  const conPrezzo = attive.filter((w) => prezzo(w) !== null);
+  const bottiglieConPrezzo = sum(conPrezzo);
+  const valore = conPrezzo.reduce((s, w) => s + prezzo(w) * qty(w), 0);
+  if (bottiglieConPrezzo > 0) {
+    const mancanti = sum(attive) - bottiglieConPrezzo;
+    tiles.push(
+      {
+        label: mancanti > 0 ? `Valore (${mancanti} senza prezzo)` : "Valore della cantina",
+        val: euro(valore),
+        icon: <Icon name="euro" size={22} />,
+        color: "var(--gold)",
+      },
+      { label: "Prezzo medio a bottiglia", val: euro(valore / bottiglieConPrezzo), icon: <Icon name="tag" size={22} />, color: "var(--gold)" }
+    );
+  }
 
   const filtered = attive.filter((w) => (!nazione || w.nazione === nazione) && (!regione || w.regione === regione));
   const count = (list, key) => {
