@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { Icon, WineBottle } from "./icons.jsx";
-import { annataLabel, getWindowStatus, qty, STATUS_COLOR, toYear } from "./data.js";
+import { annataLabel, euro, getWindowStatus, prezzo, qty, STATUS_COLOR, toYear } from "./data.js";
 
 export function StatusBadge({ wine }) {
   const s = getWindowStatus(wine);
@@ -84,6 +84,11 @@ export function WineCard({ wine, onClick, drunk = false, children }) {
           <>
             <div className="wine__row">
               <span className={`badge badge--${s.key || "none"}`}>{s.label}</span>
+              {prezzo(wine) !== null && (
+                <span className="chip chip--soft chip--price">
+                  <Icon name="tag" size={12} /> {euro(prezzo(wine))}
+                </span>
+              )}
               {wine.posizione && (
                 <span className="chip chip--soft">
                   <Icon name="pin" size={12} /> {wine.posizione}
